@@ -3,12 +3,6 @@ import re
 
 class XmlParser:
     out = ''
-    split_list_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(.*?)[ \s]*</\1>', flags=re.S)
-    get_list_re = re.compile(r'<(\b\w+\b[\w ]*)>(.*?)</\1>', flags=re.S)
-    has_tags_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>', flags=re.S)
-    get_tag_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>', flags=re.S)
-    match_tag_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>\s?(?P<rest>.*)', flags=re.S)
-    del_start_re = re.compile(r'^ {0,4}\t?', falgs=re.M)
 
     def __init__(self, xml_str):
         self.xml_doc = xml_str
@@ -53,25 +47,30 @@ class XmlParser:
     def __beauty_var(i: str):
         return f"'{i}'" if i.isdecimal() else i
 
-    def __split_list(self, line):
-        info = self.split_list_re.findall(line)
+    @staticmethod
+    def __split_list(line):
+        info = re.findall(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(.*?)[ \s]*</\1>', line, flags=re.S)
         return [i[1] for i in info]
 
-    def __get_list(self, lines):
-        listed_info = self.get_list_re.findall(lines)
+    @staticmethod
+    def __get_list(lines):
+        listed_info = re.findall(r'<(\b\w+\b[\w ]*)>(.*?)</\1>', lines, flags=re.S)
         return [i[1] for i in listed_info]
 
-    def __has_tags(self, lines):
-        matched = self.has_tags_re.search(lines)
+    @staticmethod
+    def __has_tags(lines):
+        matched = re.search(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>', lines, flags=re.S)
         return bool(matched)
 
-    def __get_tag(self, lines):
-        match = self.get_tag_re.search(lines)
+    @staticmethod
+    def __get_tag(lines):
+        match = re.search(r'<(?P<tag>\b\w+\b)[\w ]*>', lines, flags=re.S)
         return match.group("tag")
 
-    def __match_tag(self, lines):
-        matched = self.match_tag_re.search(lines)
-        del_start_spaces = self.del_start_re.sub('', matched.group("info"))
+    @staticmethod
+    def __match_tag(lines):
+        matched = re.search(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>\s?(?P<rest>.*)', lines, flags=re.S)
+        del_start_spaces = re.sub('^ {0,4}\t?', '', matched.group("info"), flags=re.M)
         return matched.group("tag"), del_start_spaces, matched.group("rest")
 
     def __del_info_data(self):
