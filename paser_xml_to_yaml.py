@@ -1,3 +1,4 @@
+import time
 
 
 class XmlParser:
@@ -66,7 +67,10 @@ class XmlParser:
 
 
 if __name__ == '__main__':
-    with open("Myxml.xml", "r", encoding="utf16") as input_file:
-        parser_xml = XmlParser(input_file.read())
-        with open('Myyaml.yaml', 'w', encoding="utf-16") as out_file:
-            out_file.write(parser_xml.to_jaml())
+    start_time = time.time()
+    for i in range(100):
+        with open("Myxml.xml", "r", encoding="utf16") as input_file:
+            parser_xml = XmlParser(input_file.read())
+            with open('Myyaml.yaml', 'w', encoding="utf-16") as out_file:
+                out_file.write(parser_xml.to_jaml())
+    print('Время стократного выполнения программы: ', time.time() - start_time)

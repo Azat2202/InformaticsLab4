@@ -49,5 +49,6 @@ class XmlParser:
 
 
 if __name__ == '__main__':
+
     with open("Myxml.xml", "r", encoding="utf16") as input_file:
         parser = XmlParser(input_file.read())
