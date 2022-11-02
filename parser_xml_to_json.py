@@ -6,28 +6,23 @@ class XmlParser:
     def __init__(self, xml_str):
         self.xml_doc = xml_str
         self.__del_info_data()
-        self.json_parsed = self.__find_sub(self.xml_doc).items()
+        print(self.__find_sub(self.xml_doc))
 
-    def __find_sub(self, line: str) -> dict:
+    def __find_sub(self, line: str, tab_count=0, needs_minus=False) -> dict:
         tag, info, rest = self.__match_tag(line)
         info_has_tags, rest_has_tags = self.__has_tags(info), self.__has_tags(rest)
         if not info_has_tags and not rest_has_tags:
             return {tag: info}
         if not info_has_tags and rest_has_tags:
             if self.__get_tag(rest) == tag:
-                return {tag: self.__get_list(line + rest)}
-            return {tag: info} | self.__find_sub(rest)
+                return {tag: self.__get_list(line)}
+            return {tag: info} | self.__find_sub(rest, tab_count)
         if info_has_tags and not rest_has_tags:
-            return {tag: self.__find_sub(info)}
+            return {tag: self.__find_sub(info, tab_count + 1)}
         if info_has_tags and rest_has_tags:
             if self.__get_tag(rest) == tag:
                 return {tag: [self.__find_sub(info), self.__find_sub(rest)]}
-            return {tag: self.__find_sub(info)} | self.__find_sub(rest)
-
-    def printing(self, info:dict):
-        for i, j in info:
-            if isinstance(j, list):
-                print(i, amir_huy_sosi)
+            return {tag: self.__find_sub(info, tab_count + 1)} | self.__find_sub(rest, tab_count)
 
     def __get_list(self, lines):
         infos = re.findall(r'<(\b\w+\b[\w ]*)>(.*?)</\1>', lines, flags=re.S)
