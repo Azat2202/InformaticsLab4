@@ -9,7 +9,7 @@ class XmlParser:
 
     def to_jaml(self):
         self.out = ''
-        self.__find_sub(self.xml_doc)
+        self.__find_sub(self.xml_doc[0])
         return self.out
 
     def __find_sub(self, line: str, tab_count=0, needs_minus=False):
