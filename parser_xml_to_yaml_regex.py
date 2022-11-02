@@ -4,11 +4,10 @@ import re
 class XmlParser:
     out = ''
     split_list_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(.*?)[ \s]*</\1>', flags=re.S)
-    get_list_re = re.compile(r'<(\b\w+\b[\w ]*)>(.*?)</\1>', flags=re.S)
     has_tags_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>', flags=re.S)
     get_tag_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>', flags=re.S)
     match_tag_re = re.compile(r'<(?P<tag>\b\w+\b)[\w ]*>\s?(?P<info>.*?)</\1>\s?(?P<rest>.*)', flags=re.S)
-    del_start_re = re.compile(r'^ {0,4}\t?', falgs=re.M)
+    del_start_re = re.compile(r'^ {0,4}\t?', flags=re.M)
 
     def __init__(self, xml_str):
         self.xml_doc = xml_str
@@ -27,11 +26,11 @@ class XmlParser:
         else:
             self.out += '  ' * (tab_count - 2) + '  - '
         if not info_has_tags and not rest_has_tags:
-            self.out += tag + ': ' + self.__beauty_var(info) + '\n'
+            self.out += tag + ': ' + info + '\n'
         if not info_has_tags and rest_has_tags:
             if self.__get_tag(rest) == tag:
                 self.out += tag + ': \n'
-                for i in self.__get_list(line):
+                for i in self.__split_list(line):
                     self.out += '  ' * tab_count + '  - ' + i + '\n'
                 return
             self.out += tag + ': ' + info + '\n'
@@ -49,17 +48,9 @@ class XmlParser:
             self.__find_sub(info, tab_count + 1)
             self.__find_sub(rest, tab_count)
 
-    @staticmethod
-    def __beauty_var(i: str):
-        return f"'{i}'" if i.isdecimal() else i
-
     def __split_list(self, line):
         info = self.split_list_re.findall(line)
         return [i[1] for i in info]
-
-    def __get_list(self, lines):
-        listed_info = self.get_list_re.findall(lines)
-        return [i[1] for i in listed_info]
 
     def __has_tags(self, lines):
         matched = self.has_tags_re.search(lines)
